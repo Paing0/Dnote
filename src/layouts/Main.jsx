@@ -5,7 +5,7 @@ import Navbar from "../components/Navbar";
 const Main = () => {
   return (
     <>
-      <section>
+      <section className="max-w-5xl mx-auto relative h-screen">
         <Navbar></Navbar>
         <Outlet />
       </section>
