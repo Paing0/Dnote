@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import Note from "../components/Note";
 import Plus from "../components/Plus";
+
 import { InfinitySpin } from "react-loader-spinner";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Index = () => {
   const [notes, setNotes] = useState([]);
@@ -21,13 +24,31 @@ const Index = () => {
     getNotes();
   }, []);
 
+  const customAlert = (message) => {
+    toast.success(message, {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+  };
+
   return (
     <section className="flex gap-6 flex-wrap px-10 mt-10">
       {!loading && notes.length > 0 ? (
         <>
           {/* Map through notes and send each note to the Note component */}
           {notes.map((note) => (
-            <Note key={note._id} note={note} />
+            <Note
+              key={note._id}
+              note={note}
+              getNotes={getNotes}
+              customAlert={customAlert}
+            />
           ))}
         </>
       ) : (
@@ -40,6 +61,20 @@ const Index = () => {
           />
         </div>
       )}
+
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition:Bounce
+      />
       <Plus />
     </section>
   );

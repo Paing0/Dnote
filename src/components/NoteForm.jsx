@@ -1,17 +1,20 @@
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
-import { Link } from "react-router-dom";
-import { Formik, Field, Form } from "formik";
+import { Field, Form, Formik } from "formik";
+import { useState } from "react";
+import { Link, Navigate } from "react-router-dom";
+import { toast, ToastContainer, Bounce } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import * as Yup from "yup";
-
-// import StypedErrorMessage from formik
 import StyledErrorMessage from "./StyledErrorMessage";
 
 const NoteForm = ({ isCreate }) => {
+  const [redirect, setRedirect] = useState(false);
   const initialValues = {
     title: "",
     content: "",
   };
 
+  // Define validation schema using Yup
   const NoteFromSchema = Yup.object({
     title: Yup.string()
       .min(3, "Title must have at least 3 characters.")
@@ -22,12 +25,54 @@ const NoteForm = ({ isCreate }) => {
       .required("Content is required."),
   });
 
-  const submitHandler = (values) => {
-    console.log(values);
+  // Handle form submission
+  const submitHandler = async (values) => {
+    if (isCreate) {
+      const response = await fetch(`${import.meta.env.VITE_API}/create`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+      // Redirect on successful creation (status 201)
+      if (response.status === 201) {
+        setRedirect(true);
+      } else {
+        toast.error("Failed to create the note. Try again!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+      }
+    }
   };
+
+  // Redirect after successful form submission
+  if (redirect) {
+    return <Navigate to={"/"} />;
+  }
 
   return (
     <section>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition:Bounce
+      />
+
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold mb-5">
           {isCreate ? "Create a new note" : "Edit your post"}
@@ -36,17 +81,20 @@ const NoteForm = ({ isCreate }) => {
           <ArrowLeftIcon width={22} />
         </Link>
       </div>
+
+      {/* Formik for form handling and validation */}
       <Formik
         initialValues={initialValues}
         validationSchema={NoteFromSchema}
         onSubmit={submitHandler}
       >
-        {({ errors, touched }) => (
+        {() => (
           <Form>
             <div className="mb-3">
               <label className="font-medium block" htmlFor="title">
                 Note title
               </label>
+              {/* Field component to bind formik field */}
               <Field
                 className="text-lg border-2 border-teal-600 py-1 w-full rounded-lg"
                 type="text"
@@ -55,6 +103,7 @@ const NoteForm = ({ isCreate }) => {
               />
             </div>
 
+            {/* Display validation errors */}
             <StyledErrorMessage name={"title"} />
 
             <div className="mb-3">
