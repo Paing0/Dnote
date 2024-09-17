@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Note from "../components/Note";
-import Plus from "../components/Plus";
 
 import { InfinitySpin } from "react-loader-spinner";
 import { toast, ToastContainer } from "react-toastify";
@@ -38,7 +37,7 @@ const Index = () => {
   };
 
   return (
-    <section className="flex gap-6 flex-wrap px-10 mt-10">
+    <section className="flex justify-center gap-6 flex-wrap px-10 mt-10">
       {!loading && notes.length > 0 ? (
         <>
           {/* Map through notes and send each note to the Note component */}
@@ -75,7 +74,6 @@ const Index = () => {
         theme="light"
         transition:Bounce
       />
-      <Plus />
     </section>
   );
 };

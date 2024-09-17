@@ -9,7 +9,6 @@ import { Link } from "react-router-dom";
 
 const Note = ({ note, getNotes, customAlert }) => {
   const { _id, title, content, createdAt } = note;
-
   const deleteNote = async () => {
     const response = await fetch(`${import.meta.env.VITE_API}/delete/${_id}`, {
       method: "DELETE",

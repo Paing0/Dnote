@@ -38,7 +38,7 @@ const Details = () => {
           </div>
           <h3 className="text-3xl font-medium">{note.title}</h3>
           <div className="border-t-4 border-t-teal-600 shadow-xl p-3 mt-4">
-            <div>
+            <div className="flex gap-4">
               <p className="flex items-center gap-2 font-medium text-gray-600">
                 <UserIcon className="w-5 h-5" /> {note.author}
               </p>
