@@ -267,7 +267,7 @@ const NoteForm = ({ isCreate }) => {
             </div>
 
             <button
-              className="text-white bg-teal-600 py-3 font-medium w-full"
+              className="text-white bg-teal-600 py-3 font-medium w-full rounded-lg"
               type="submit"
             >
               {isCreate ? "Save" : "Update Note"}
