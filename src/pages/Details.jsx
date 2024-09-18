@@ -1,7 +1,7 @@
 import { CalendarDaysIcon, UserIcon } from "@heroicons/react/24/solid";
 import { formatISO9075 } from "date-fns/formatISO9075";
 import { useEffect, useState } from "react";
-import { InfinitySpin } from "react-loader-spinner";
+import { TailSpin } from "react-loader-spinner";
 import { Link, useParams } from "react-router-dom";
 
 const Details = () => {
@@ -64,11 +64,11 @@ const Details = () => {
         </section>
       ) : (
         <div className="flex items-center justify-center w-full">
-          <InfinitySpin
+          <TailSpin
             visible={loading}
             width="200"
             color="#0d9488"
-            ariaLabel="infinity-spin-loading"
+            ariaLabel="tailspin-spin-loading"
           />
         </div>
       )}

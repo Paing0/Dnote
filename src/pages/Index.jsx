@@ -1,28 +1,44 @@
 import { useEffect, useState } from "react";
 import Note from "../components/Note";
 
-import { InfinitySpin } from "react-loader-spinner";
+import { TailSpin } from "react-loader-spinner";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Index = () => {
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
 
   // Fetch notes from API
-  const getNotes = async () => {
+  const getNotes = async (pageNum) => {
     setLoading(true);
-    const response = await fetch(`${import.meta.env.VITE_API}/notes`);
-    const notes = await response.json();
+    const response = await fetch(
+      `${import.meta.env.VITE_API}/notes?page=${pageNum}`,
+    );
+    const { notes, totalPages } = await response.json();
+    setTotalPages(totalPages);
     setNotes(notes);
     setLoading(false);
   };
 
   // Fetch notes when the component mounts
   useEffect(() => {
-    getNotes();
-  }, []);
+    getNotes(currentPage);
+  }, [currentPage]);
 
+  const handlePrevious = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
   const customAlert = (message) => {
     toast.success(message, {
       position: "top-right",
@@ -48,14 +64,34 @@ const Index = () => {
               customAlert={customAlert}
             />
           ))}
+          <div className="w-full flex items-center justify-center gap-3">
+            {currentPage > 1 && (
+              <button
+                className="text-white text-lg font-medium bg-teal-600 px-3 py-1"
+                type="button"
+                onClick={handlePrevious}
+              >
+                Previous
+              </button>
+            )}
+            {currentPage < totalPages && (
+              <button
+                className="text-white text-lg font-medium bg-teal-600 px-3 py-1"
+                type="button"
+                onClick={handleNext}
+              >
+                Next
+              </button>
+            )}
+          </div>
         </>
       ) : (
         <div className="flex items-center justify-center w-full">
-          <InfinitySpin
+          <TailSpin
             visible={loading}
             width="200"
             color="#0d9488"
-            ariaLabel="infinity-spin-loading"
+            ariaLabel="tailspin-spin-loading"
           />
         </div>
       )}
