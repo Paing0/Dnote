@@ -26,10 +26,9 @@ const Index = () => {
   const customAlert = (message) => {
     toast.success(message, {
       position: "top-right",
-      autoClose: 5000,
+      autoClose: 3000,
       hideProgressBar: false,
       closeOnClick: true,
-      pauseOnHover: true,
       draggable: true,
       progress: undefined,
       theme: "light",
@@ -70,7 +69,6 @@ const Index = () => {
         rtl={false}
         pauseOnFocusLoss
         draggable
-        pauseOnHover
         theme="light"
         transition:Bounce
       />

@@ -1,6 +1,6 @@
-import { ArrowLeftIcon } from "@heroicons/react/24/solid";
+import { ArrowLeftIcon, ArrowUpTrayIcon } from "@heroicons/react/24/solid";
 import { Field, Form, Formik } from "formik";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -10,6 +10,9 @@ import StyledErrorMessage from "./StyledErrorMessage";
 const NoteForm = ({ isCreate }) => {
   const [redirect, setRedirect] = useState(false);
   const [oldNote, setOldNote] = useState({});
+  const [previewImage, setPreviewImage] = useState(null);
+  const [isUpload, setIsUpload] = useState(false);
+  const fileRef = useRef();
 
   const { id } = useParams();
 
@@ -34,7 +37,10 @@ const NoteForm = ({ isCreate }) => {
     title: isCreate ? "" : oldNote.title,
     content: isCreate ? "" : oldNote.content,
     note_id: isCreate ? "" : oldNote._id,
+    cover_image: isCreate ? null : oldNote.cover_image,
   };
+
+  const SUPPORTED_FORMATS = ["image/png", "image/jpg", "image/jpeg"];
 
   // Define validation schema using Yup
   const NoteFromSchema = Yup.object({
@@ -45,7 +51,32 @@ const NoteForm = ({ isCreate }) => {
     content: Yup.string()
       .min(3, "Content must have at least 3 characters.")
       .required("Content is required."),
+    cover_image: Yup.mixed()
+      .nullable()
+      .test(
+        "FILE_FORMAT",
+        "File type is not supported.",
+        (value) => !value || SUPPORTED_FORMATS.includes(value.type),
+      ),
   });
+
+  // Handle image change
+  const handleImageChange = (event, setFieldValue) => {
+    const selectedImage = event.target.files[0];
+    if (selectedImage) {
+      setPreviewImage(URL.createObjectURL(selectedImage));
+      setFieldValue("cover_image", selectedImage);
+    }
+  };
+
+  // clear PreviewImage
+  const clearPreviewImage = (setFieldValue) => {
+    setPreviewImage(null);
+    setFieldValue("cover_image", null);
+    if (isCreate) {
+      fileRef.current.value = "";
+    }
+  };
 
   // Handle form submission
   const submitHandler = async (values) => {
@@ -58,10 +89,15 @@ const NoteForm = ({ isCreate }) => {
       : "Failed to update the note. Try again!";
     const statusCode = isCreate ? 201 : 200;
 
+    const formData = new FormData();
+    formData.append("title", values.title);
+    formData.append("content", values.content);
+    formData.append("cover_image", values.cover_image);
+    formData.append("note_id", values.note_id);
+
     const response = await fetch(API, {
       method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(values),
+      body: formData,
     });
 
     // handle different statusCode
@@ -73,7 +109,6 @@ const NoteForm = ({ isCreate }) => {
         autoClose: 3000,
         hideProgressBar: false,
         closeOnClick: true,
-        pauseOnHover: true,
         draggable: true,
         progress: undefined,
         theme: "light",
@@ -98,7 +133,6 @@ const NoteForm = ({ isCreate }) => {
         rtl={false}
         pauseOnFocusLoss
         draggable
-        pauseOnHover
         theme="light"
         transition:Bounce
       />
@@ -119,11 +153,11 @@ const NoteForm = ({ isCreate }) => {
         onSubmit={submitHandler}
         enableReinitialize={true}
       >
-        {() => (
-          <Form>
+        {({ setFieldValue }) => (
+          <Form encType="multipart/form-data">
             <div className="mb-3">
               <label className="font-medium block" htmlFor="title">
-                Note title
+                Note Title
               </label>
               {/* Field component to bind formik field */}
               <Field
@@ -132,10 +166,10 @@ const NoteForm = ({ isCreate }) => {
                 name="title"
                 id="title"
               />
-            </div>
 
-            {/* Display validation errors */}
-            <StyledErrorMessage name={"title"} />
+              {/* Display validation errors */}
+              <StyledErrorMessage name={"title"} />
+            </div>
 
             <div className="mb-3">
               <label className="font-medium block" htmlFor="content">
@@ -149,14 +183,91 @@ const NoteForm = ({ isCreate }) => {
                 name="content"
                 id="content"
               />
+
+              <StyledErrorMessage name={"content"} />
             </div>
 
-            <StyledErrorMessage name={"content"} />
+            <div className="mb-3">
+              <div className="flex items-center justify-between">
+                <label className="font-medium block" htmlFor="cover">
+                  Cover Image{" "}
+                  <span className="text-xs font-medium">(optional)</span>
+                </label>
+                {previewImage && (
+                  <p
+                    className="text-base font-medium text-teal-600 cursor-pointer"
+                    onClick={() => {
+                      clearPreviewImage(setFieldValue);
+                    }}
+                  >
+                    Clear
+                  </p>
+                )}
+              </div>
 
-            <Field type="text" name="note_id" id="note_id" hidden />
+              {isUpload ? (
+                <p
+                  className="text-base font-medium text-teal-600 cursor-pointer"
+                  onClick={() => setIsUpload(false)}
+                >
+                  Hide cover image
+                </p>
+              ) : (
+                <p
+                  className="text-base font-medium text-teal-600 cursor-pointer"
+                  onClick={() => setIsUpload(true)}
+                >
+                  Upload cover image
+                </p>
+              )}
+              {isUpload && (
+                <>
+                  <input
+                    type="file"
+                    name="cover_image"
+                    hidden
+                    ref={fileRef}
+                    onChange={(e) => {
+                      handleImageChange(e, setFieldValue);
+                    }}
+                  />
+                  <div
+                    className="border-2 border-teal-600 flex items-center justify-center text-teal-600 border-dashed h-60 cursor-pointer rounded-lg relative overflow-hidden"
+                    onClick={() => {
+                      fileRef.current.click();
+                    }}
+                  >
+                    <ArrowUpTrayIcon className="z-20" width={30} height={30} />
+                    {isCreate ? (
+                      <>
+                        {previewImage && (
+                          <img
+                            src={previewImage}
+                            alt="Preview Image"
+                            className="w-full absolute top-0 left-0 h-full object-cover opacity-80 z-10"
+                          />
+                        )}
+                      </>
+                    ) : (
+                      <img
+                        src={
+                          previewImage
+                            ? previewImage
+                            : `${import.meta.env.VITE_API}/${oldNote.cover_image}`
+                        }
+                        alt="Preview Image"
+                        className="w-full absolute top-0 left-0 h-full object-cover opacity-80 z-10"
+                      />
+                    )}
+                  </div>
+                </>
+              )}
+
+              <StyledErrorMessage name={"cover_image"} />
+            </div>
 
             <button
-              className="text-white bg-teal-600 py-3 mt-3 font-medium w-full"
+              className="text-white bg-teal-600 py-3 font-medium w-full"
               type="submit"
             >
               {isCreate ? "Save" : "Update Note"}
