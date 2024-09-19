@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import Note from "../components/Note";
 
 import { TailSpin } from "react-loader-spinner";
+
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
+import Note from "../components/Note";
 
 const Index = () => {
   const [notes, setNotes] = useState([]);
