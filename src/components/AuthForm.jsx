@@ -17,10 +17,12 @@ const AuthForm = ({ isLogin }) => {
 
   // Define validation schema using Yup
   const AuthFormSchema = Yup.object({
-    username: Yup.string()
-      .min(3, "Username must have at least 3 characters.")
-      .max(10, "Username must not be over 10 characters")
-      .required("Username is required."),
+    username: isLogin
+      ? null
+      : Yup.string()
+          .min(3, "Username must be at least 3 characters")
+          .max(10, "Username must be less than 10 characters")
+          .required("Username is required!"),
     email: Yup.string()
       .required("Email is required!")
       .email("Please enter an vaild email!"),
@@ -32,38 +34,62 @@ const AuthForm = ({ isLogin }) => {
   const submitHandler = async (values) => {
     const { username, email, password } = values;
 
-    if (isLogin) {
-      //
-    } else {
-      const response = await fetch(`${import.meta.env.VITE_API}/register`, {
-        body: JSON.stringify({ username, email, password }),
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (response.status === 201) {
-        setRedirect(true);
-      } else if (response.status === 400) {
-        const data = await response.json();
-        const errorMessage = data.errorMessages[0].msg;
+    const API = isLogin
+      ? `${import.meta.env.VITE_API}/login`
+      : `${import.meta.env.VITE_API}/register`;
+    const body = isLogin
+      ? JSON.stringify({ email, password })
+      : JSON.stringify({ username, email, password });
 
-        toast.error(errorMessage, {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-      }
+    const response = await fetch(API, {
+      body,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const toastFire = (message) => {
+      toast.error(message, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    };
+
+    const responseData = await response.json();
+    switch (response.status) {
+      case 200:
+      case 201:
+        setRedirect(true);
+        break;
+
+      case 400:
+        toastFire(responseData.errorMessages?.[0]?.msg || "Validation error");
+        break;
+
+      case 401:
+        toastFire(responseData.message || "Unauthorized");
+        break;
+
+      case 404:
+        toastFire(responseData.message || "Email not found");
+        break;
+
+      default:
+        toastFire("An unexpected error occurred.");
+        break;
     }
   };
 
   if (redirect) {
-    return <Navigate to={"/"} />;
+    return <Navigate to={isLogin ? "/" : "/login"} />;
   }
+
   return (
     <>
       <ToastContainer
