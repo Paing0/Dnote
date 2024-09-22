@@ -47,16 +47,18 @@ const Details = () => {
               />
             )}
             <div className="flex gap-4 my-2">
-              <p className="flex items-center gap-2 font-medium text-gray-600">
-                <UserIcon className="w-5 h-5" /> {note.author}
-              </p>
-              {note.createdAt && (
-                <p className="flex items-center gap-2 font-medium text-gray-600">
-                  <CalendarDaysIcon className="w-5 h-5" />
-                  {formatISO9075(new Date(note.createdAt), {
-                    representation: "date",
-                  })}
-                </p>
+              {note.createdAt && note.author && (
+                <>
+                  <p className="flex items-center gap-2 font-medium text-gray-600">
+                    <UserIcon className="w-5 h-5" /> {note.author.username}
+                  </p>
+                  <p className="flex items-center gap-2 font-medium text-gray-600">
+                    <CalendarDaysIcon className="w-5 h-5" />
+                    {formatISO9075(new Date(note.createdAt), {
+                      representation: "date",
+                    })}
+                  </p>
+                </>
               )}
             </div>
             <p className="text-base mt-2">{note.content}</p>

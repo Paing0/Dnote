@@ -2,16 +2,25 @@ import {
   EyeIcon,
   PencilSquareIcon,
   TrashIcon,
+  CalendarDaysIcon,
 } from "@heroicons/react/24/solid";
+
 import formatISO9075 from "date-fns/formatISO9075";
 
+import { useContext } from "react";
 import { Link } from "react-router-dom";
+import { UserContext } from "../contexts/UserContext";
 
 const Note = ({ note, getNotes, customAlert }) => {
   const { _id, title, content, createdAt } = note;
+  const { token } = useContext(UserContext);
+
   const deleteNote = async () => {
     const response = await fetch(`${import.meta.env.VITE_API}/delete/${_id}`, {
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token.token}`,
+      },
     });
 
     if (response.status === 204) {
@@ -26,6 +35,7 @@ const Note = ({ note, getNotes, customAlert }) => {
       <p className="text-sm mt-2 break-words">{content.slice(0, 120)}</p>
       <div className="flex items-center justify-between mt-2 border-t pt-2">
         <p className="text-sm font-medium">
+          <CalendarDaysIcon className="w-5 h-5 inline mr-2" />
           {formatISO9075(new Date(createdAt), { representation: "date" })}
         </p>
 

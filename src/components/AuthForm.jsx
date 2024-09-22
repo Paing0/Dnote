@@ -3,11 +3,13 @@ import * as Yup from "yup";
 import StyledErrorMessage from "./StyledErrorMessage";
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
+import { UserContext } from "../contexts/UserContext";
 
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import { useContext } from "react";
 const AuthForm = ({ isLogin }) => {
+  const { updateToken } = useContext(UserContext);
   const [redirect, setRedirect] = useState(false);
   const initialValues = {
     username: "",
@@ -64,6 +66,9 @@ const AuthForm = ({ isLogin }) => {
     const responseData = await response.json();
     switch (response.status) {
       case 200:
+        updateToken(responseData);
+        setRedirect(true);
+        break;
       case 201:
         setRedirect(true);
         break;

@@ -95,9 +95,12 @@ const Index = () => {
             color="#0d9488"
             ariaLabel="tailspin-spin-loading"
           />
+
+          {!loading && notes.length === 0 && (
+            <p>No notes have been created yet.</p>
+          )}
         </div>
       )}
-
       <ToastContainer
         position="top-right"
         autoClose={3000}
