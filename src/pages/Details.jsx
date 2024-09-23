@@ -16,6 +16,7 @@ const Details = () => {
     const response = await fetch(`${import.meta.env.VITE_API}/notes/${id}`);
     const note = await response.json();
     setNote(note);
+
     setLoading(false);
   };
 

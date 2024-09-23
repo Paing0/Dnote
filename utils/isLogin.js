@@ -14,6 +14,8 @@ const isLogin = async () => {
   });
 
   if (!response.ok) {
+    localStorage.setItem("token", null);
+    window.location.reload(false);
     return redirect("/");
   } else {
     return null;

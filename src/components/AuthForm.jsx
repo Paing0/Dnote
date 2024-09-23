@@ -11,6 +11,7 @@ import { useContext } from "react";
 const AuthForm = ({ isLogin }) => {
   const { updateToken } = useContext(UserContext);
   const [redirect, setRedirect] = useState(false);
+
   const initialValues = {
     username: "",
     email: "",
@@ -114,7 +115,7 @@ const AuthForm = ({ isLogin }) => {
         validationSchema={AuthFormSchema}
         onSubmit={submitHandler}
       >
-        {() => (
+        {({ isSubmitting }) => (
           <Form className="w-1/2 mx-auto">
             <h1 className="text-center font-bold text-4xl text-teal-600">
               {isLogin ? "Login" : "Register"}
@@ -172,8 +173,11 @@ const AuthForm = ({ isLogin }) => {
             <button
               className="text-white bg-teal-600 py-3 font-medium w-full rounded-lg"
               type="submit"
+              disabled={isSubmitting}
             >
-              {isLogin ? "Login" : "Register"}
+              {isLogin
+                ? `${isSubmitting ? "Submitting..." : "Login"}`
+                : `${isSubmitting ? "Submitting..." : "Register"}`}
             </button>
           </Form>
         )}
