@@ -23,7 +23,11 @@ const NoteForm = ({ isCreate }) => {
   const { id } = useParams();
 
   const getoldNotes = async () => {
-    const response = await fetch(`${import.meta.env.VITE_API}/edit/${id}`);
+    const response = await fetch(`${import.meta.env.VITE_API}/edit/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token.token}`,
+      },
+    });
 
     if (response.status === 200) {
       const note = await response.json();

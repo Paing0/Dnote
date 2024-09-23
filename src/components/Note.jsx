@@ -24,8 +24,10 @@ const Note = ({ note, getNotes, customAlert }) => {
     });
 
     if (response.status === 204) {
-      customAlert("Note Deleted");
+      customAlert("Note Deleted", 204);
       getNotes();
+    } else {
+      customAlert("Auth Failed", 401);
     }
   };
 
@@ -40,15 +42,19 @@ const Note = ({ note, getNotes, customAlert }) => {
         </p>
 
         <div className="flex items-center justify-end gap-2">
-          <TrashIcon
-            className="text-red-600 cursor-pointer"
-            width={20}
-            onClick={deleteNote}
-          />
-          <Link to={"/edit/" + _id}>
-            <PencilSquareIcon className="text-teal-600" width={20} />
-          </Link>
-
+          {token && note.author.toString() === token.userId && (
+            <>
+              {}
+              <TrashIcon
+                className="text-red-600 cursor-pointer"
+                width={20}
+                onClick={deleteNote}
+              />
+              <Link to={"/edit/" + _id}>
+                <PencilSquareIcon className="text-teal-600" width={20} />
+              </Link>
+            </>
+          )}
           <Link to={"/notes/" + _id}>
             <EyeIcon className="text-gray-600" width={20} />
           </Link>

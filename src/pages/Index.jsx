@@ -41,16 +41,28 @@ const Index = () => {
       setCurrentPage(currentPage + 1);
     }
   };
-  const customAlert = (message) => {
-    toast.success(message, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-    });
+  const customAlert = (message, status) => {
+    if (status === 204) {
+      toast.success(message, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    } else {
+      toast.error(message, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    }
   };
 
   return (
@@ -97,7 +109,7 @@ const Index = () => {
           />
 
           {!loading && notes.length === 0 && (
-            <p>No notes have been created yet.</p>
+            <p>No notes have been created yet</p>
           )}
         </div>
       )}
